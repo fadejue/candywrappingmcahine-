@@ -27,33 +27,34 @@ void backwardstep2() {
   armroate2->onestep(BACKWARD, DOUBLE);
   AccelStepper stepper1(forwardstep1, backwardstep1);
 
-void arms() {
-   if (stepper1.distanceToGo() == 0)
-    stepper1.moveTo(stepper1.currentPosition());
-   if (stepper2.distanceToGo() == 0)
-    stepper2.moveTo(-stepper2.currentPosition());
+  void arms() {
+    if (stepper1.distanceToGo() == 0)
+      stepper1.moveTo(stepper1.currentPosition());
+    if (stepper2.distanceToGo() == 0)
+      stepper2.moveTo(-stepper2.currentPosition());
     stepper1.run();
     stepper2.run();
   }
-
-  void setup() {
-    
-  }
-    Serial.begin(9600);// set up Serial library at 9600 bps
-    AFMSfirst.begin(); // Start the bottom shield
-    AFMSsecond.begin(); // Start the top shield
-    delay(1000);
-
-    Serial.println("now run");
-    stepper1.setMaxSpeed(100.0);
-    stepper1.setAcceleration(100.0);
-    stepper1.moveTo(100);
-    Serial.println("it ran");
-    stepper2.setMaxSpeed(200.0);
-    stepper2.setAcceleration(100.0);
-    stepper2.moveTo(50000);
 }
 
-  void loop() {
-    arms();
-  }
+void setup() {
+
+
+  Serial.begin(9600);// set up Serial library at 9600 bps
+  AFMSfirst.begin(); // Start the bottom shield
+  AFMSsecond.begin(); // Start the top shield
+  delay(1000);
+
+  Serial.println("now run");
+  stepper1.setMaxSpeed(100.0);
+  stepper1.setAcceleration(100.0);
+  stepper1.moveTo(100);
+  Serial.println("it ran");
+  stepper2.setMaxSpeed(200.0);
+  stepper2.setAcceleration(100.0);
+  stepper2.moveTo(50000);
+}
+
+void loop() {
+  arms();
+}
