@@ -1,0 +1,165 @@
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+
+Adafruit_MotorShield AFMStop = Adafruit_MotorShield(0x61); //right jumpers soldered
+Adafruit_MotorShield AFMSbot = Adafruit_MotorShield(0x60); //bottom board with stacking headers
+
+Adafruit_StepperMotor *myMotor1 = AFMSbot.getStepper(200, 1); //this is the bourbon motor
+
+#define limit1 13 //Pin8 connected to the limit switch activate for limit switch
+#define limit2 9 //Pin9 connected to the limit switch activate for limit switch
+#define fill 5 //Pin5 connected to homing and bitters-fill
+#define pourbutton 4 //Pin 4 connected to pour button
+#define estop 6 //Pin 6 connected to e-stop button
+
+int buttonState = 0;  //variable for reading the pour button
+int estopState = 0;  //variable for reading the e-stop button
+int steps1;           // Variable for pot1 reading
+
+void setup() {
+  Serial.begin(9600); // initialize serial communication at 9600 bits per second
+  //while (!Serial);    //only begins after serial monitor is opened
+  Serial.println("Weeee! let's go!"); 
+  delay(100);
+ 
+  Serial.println("Begin talking to the bottom board"); 
+  AFMSbot.begin();
+
+  Serial.println("Begin talking to the top board"); 
+  AFMStop.begin();// create with the default frequency 1.6KHz
+   
+  myMotor1->release(); //release the motors so they don't have to maintain position
+
+   Serial.println("waiting for homing button"); 
+  // Homing procedure at startup:
+ while  (digitalRead(fill) == LOW) { //if the fill button is NOT pressed
+    Serial.println("matteru...");   
+    delay(100);
+ }
+
+   bourbonHome();
+   steps1=0;  // Reset position variable to zero
+} 
+
+void loop(){
+  // read the state of the pour button:
+buttonState = digitalRead(pourbutton);
+
+if (digitalRead(pourbutton) == HIGH) { //if the pour button is pressed
+    steps1 = map(analogRead(A0), 1, 1023, 50, 1200);
+    Serial.print("Bourbon pot = ");
+    Serial.println(steps1);
+    delay (500);
+
+  myMotor1->setSpeed(100); 
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, SINGLE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, SINGLE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, SINGLE);
+  }
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, DOUBLE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, DOUBLE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, DOUBLE);
+  }
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, INTERLEAVE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, INTERLEAVE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, INTERLEAVE);
+  }
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, MICROSTEP);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, MICROSTEP);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, MICROSTEP);
+  } 
+  myMotor1->setSpeed(200); 
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, SINGLE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, SINGLE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, SINGLE);
+  }
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, DOUBLE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, DOUBLE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, DOUBLE);
+  }
+  for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, INTERLEAVE);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, INTERLEAVE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, INTERLEAVE);
+  }
+    for (int i=0; i<steps1; i++) {
+    myMotor1->step(1, FORWARD, MICROSTEP);
+    if  (digitalRead(estop) == HIGH) { //if the e-stop button is pressed
+      bourbonHome();
+    }
+  }
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, MICROSTEP);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, MICROSTEP);
+  }
+}
+}
+
+void bourbonHome()
+{
+  while (digitalRead(limit2) == LOW) {  // Do this until the switch is activated   
+      myMotor1->step(1, BACKWARD, DOUBLE);
+   }
+  while (digitalRead(limit2) == HIGH) { // Do this until the switch is not activated
+      myMotor1->step(1, FORWARD, INTERLEAVE);
+  }
+  myMotor1->release();
+  steps1=0;  // Reset position variable to zero  myMotor1->release();
+}
